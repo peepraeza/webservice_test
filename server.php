@@ -49,14 +49,15 @@ function insertAirData($roomid, $time, $temperature, $humidity){
 	mysqli_set_charset($dbcon, 'utf8');
     $insert = "INSERT INTO data (roomid, time, temperature, humidity) VALUES ('$roomid', '$time', '$temperature', '$humidity')";
 	$result = mysqli_query($dbcon, $insert);
-// 	$end = 
-//     $response = new soapval('return', 'xsd:string', $end);
+
+    return "data inserted";
 }
 
 $server->register("insertAirData", array("roomid" => "xsd:integer",
                                          "time" => "xsd:string",
                                          "temperature" => "xsd:float",
-                                         "humidity" => "xsd:float"));
+                                         "humidity" => "xsd:float"),
+                                    array("return"=> "xsd:string"), $us);
 
 
 $server->service($HTTP_RAW_POST_DATA);
