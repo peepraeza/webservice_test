@@ -1,9 +1,12 @@
 <?php 
 require_once "lib/nusoap.php";
     
-    $client = new nusoap_client("https://test-soap-peepraeza.c9users.io/server.php?wsdl");
+    $client = new nusoap_client("https://test-soap-peepraeza.c9users.io/server2.php?wsdl");
     
-    $data = $client->call("insertAirData",array('roomid'=> 1, 'time' => '2018-10-24 00:54:00', 'temperature'=> 25.65, 'humidity'=> 12.22));
-   
+    $data = array('roomid'=> 99, 'time' => '2018-10-25 03:56:00', 'temperature'=> 100.22, 'humidity'=> 122.22);
+    $result = $client->call("set_data", array('data' => $data));
+
+    
+    print_r($result);
 ?>
 

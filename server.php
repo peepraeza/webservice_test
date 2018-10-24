@@ -2,7 +2,6 @@
 require_once "lib/nusoap.php";
 
 $us = "urn:powerdata";
-
 $server = new soap_server();
 $server->configureWSDL('PowerData', $us);
 $server->wsdl->schemaTargerNamespace->$us;
@@ -40,7 +39,7 @@ function getInfoAircon($lan){
     mysqli_close($dbcon);
     return $response;
 }
-$server->register("getInfoAircon", array("lan"=>"xsd:string"),
+$server->register("getInfoAircon", array("getdata"=>"xsd:string"),
 				 				array("return"=>"xsd:string"), $us);
 
 
