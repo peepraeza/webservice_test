@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<user_info>
+    <GetStudentData>
+        <stdname>Peerawit Wandech</stdname>
+        <stdnumber>5801012620054</stdnumber>
+        <stdhobby>
+            <0>Play tabletennis</0>
+            <1>Basketball</1>
+        </stdhobby>
+    </GetStudentData>
+</user_info>
