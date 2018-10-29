@@ -1,8 +1,8 @@
 <?php 
 require_once "lib/nusoap.php";
     
-    $client = new nusoap_client("http://test-soap-peepraeza.c9users.io/server_test.php?wsdl");
-    
+    // $client = new nusoap_client("http://test-soap-peepraeza.c9users.io/server_test.php?wsdl");
+    https://webservicehello.herokuapp.com/server.php?wsdl
     $result = $client->call("get_std_data", array("data"=> "pee"));
 
     

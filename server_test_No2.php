@@ -20,29 +20,6 @@ $server->wsdl->addComplexType(
     )
 );
 
-// $server->wsdl->addComplexType(
-//  'Hobby',
-//  'complexType',
-//  'array',
-//  '',
-//  'SOAP-ENC:Array',
-//   array(),
-//   array(
-//     array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'xsd:string[]')
-//   ),
-//   'xsd:string'
-// );
-
-// $server->wsdl->addComplexType(
-//     'Hobby',
-//     'complexType',
-//     'array',
-//     'sequence',
-//     '',
-//     array(
-//         'hobby' => array('name' => 'hobby', 'type' => 'xsd:string[]'))
-// );
-
 $server->wsdl->addComplexType(
     'SentMail',
     'complexType',
@@ -52,8 +29,33 @@ $server->wsdl->addComplexType(
     array(
         'id' => array('name' => 'id', 'type' => 'xsd:integer'),
         'name' => array('name' => 'name', 'type' => 'xsd:string'),
+        'addr' => array('name' => 'addr', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'MailStatus',
+    'complexType',
+    'struct',
+    'sequence',
+    '',
+    array(
+        'id' => array('name' => 'id', 'type' => 'xsd:integer'),
+        'name' => array('name' => 'name', 'type' => 'xsd:string'),
         'addr' => array('name' => 'addr', 'type' => 'xsd:string'),
-        'weight' => array('name' => 'weight', 'type' => 'xsd:float')
+        'weight' => array('name' => 'weight', 'type' => 'xsd:float'),
+        'status' => array('name' => 'status', 'type' => 'xsd:string')
+    )
+);
+
+$server->wsdl->addComplexType(
+    'GetMail',
+    'complexType',
+    'struct',
+    'sequence',
+    '',
+    array(
+        'GetMail' => array('name' => 'GetMail','minOccurs'=> '0', 'maxOccurs' =>'unbounded','nillable' => 'true', type=>'tns:MailStatus')
     )
 );
 
@@ -76,18 +78,19 @@ function send_mail($data) {
 $server->register('send_mail',           // method name
     array('data' => 'tns:MailData'),     // input parameters
     array('return' => 'xsd:string'),    // output parameters
-    'urn:maildata');
+                    'urn:maildata');
 
 function sent_mail_already($data) {
     $dbcon =  mysqli_connect('localhost', 'peepraeza', '', 'maildata') or die('not connect database'.mysqli_connect_error());
     mysqli_set_charset($dbcon, 'utf8');
+    $id = $data['id'];
     $name = $data['name'];
     $addr = $data['addr'];
     $weight = $data['weight'];
-    $query = "SELECT * FROM data WHERE name = '$name' and addr = '$addr' and weight = '$weight'";
+    $query = "SELECT * FROM data WHERE id = '$id' and name = '$name' and addr = '$addr'";
     $result = mysqli_query($dbcon, $query);
     if($result){
-       $query = "UPDATE data SET status = 'true' WHERE id = '$id'and name = '$name' and addr = '$addr' and weight = '$weight'";
+       $query = "UPDATE data SET status = 'true' WHERE id = '$id'and name = '$name' and addr = '$addr'";
        $result = mysqli_query($dbcon, $query);
         }
     
@@ -101,32 +104,49 @@ $server->register('sent_mail_already',           // method name
     array('return' => 'xsd:string'),    // output parameters
                         'urn:maildata');         
 
-function check_status($data) {
+function get_info_all($anything) {
     $dbcon =  mysqli_connect('localhost', 'peepraeza', '', 'maildata') or die('not connect database'.mysqli_connect_error());
     mysqli_set_charset($dbcon, 'utf8');
-    $id = $data['id'];
-    $name = $data['name'];
-    $addr = $data['addr'];
-    $weight = $data['weight'];
-    $query = "SELECT * FROM data WHERE name = '$name' and addr = '$addr' and weight = '$weight'";
+    $query = "SELECT * FROM data";
     $result = mysqli_query($dbcon, $query);
     if($result){
         $data = array();
         while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
-            $data[] = array('name'=>$row['name'], 'addr'=>$row['addr'], 'weight'=>$row['weight'], 'status'=>$row['status']);
+            $data[] = array('id'=>$row['id'], 'name'=>$row['name'], 'addr'=>$row['addr'], 'weight'=>$row['weight'], 'status'=>$row['status']);
+        }
+    }
+    mysqli_close($dbcon);
+    return array('GetMail' => $data);
+}
+
+//Register the method to expose
+$server->register('get_data_all',           // method name
+    array('anything' => 'xsd:string'),
+    array('return' => 'tns:GetMail'),    // output parameters
+                        'urn:maildata');         
+// 
+
+function get_info_from_status($status) {
+    $dbcon =  mysqli_connect('localhost', 'peepraeza', '', 'maildata') or die('not connect database'.mysqli_connect_error());
+    mysqli_set_charset($dbcon, 'utf8');
+    $query = "SELECT * FROM data WHERE status = '$status'";
+    $result = mysqli_query($dbcon, $query);
+    if($result){
+        $data = array();
+        while ($row = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+            $data[] = array('id'=>$row['id'], 'name'=>$row['name'], 'addr'=>$row['addr'], 'weight'=>$row['weight'], 'status'=>$row['status']);
         }
     }
     
     mysqli_close($dbcon);
-    return array('MailStatus' => $data);
+    return array('GetMail' => $data);
 }
 
-//Register the method to expose
-$server->register('check_status',           // method name
-    array('data' => 'tns:MailData'),
-    array('return' => 'tns:MailStatus'),    // output parameters
+// Register the method to expose
+$server->register('get_data_from_status',           // method name
+    array('status' => 'xsd:string'),
+    array('return' => 'tns:GetMail'),    // output parameters
                         'urn:maildata');         
-
 
 
 // Use the request to (try to) invoke the service

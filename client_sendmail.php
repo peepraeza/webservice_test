@@ -3,7 +3,7 @@ require_once "lib/nusoap.php";
     
     $client = new nusoap_client("https://test-soap-peepraeza.c9users.io/server_send_mail.php?wsdl");
     
-    $data = array('name'=> "Peerawit", 'addr' => "6/111 cheunkamol", 'weight'=> 150);
+    $data = array('name'=> "Supitcha", 'addr' => "4/222 Nonthaburi", 'weight'=> 12);
     $result = $client->call("send_mail", array('data' => $data));
 
     
